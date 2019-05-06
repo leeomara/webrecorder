@@ -24,6 +24,9 @@ import Resizable from 'components/Resizable';
 import { InspectorPanel, RemoteBrowser, Sidebar, SidebarListViewer, SidebarCollectionViewer, SidebarPageViewer } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
 
+const { ipcRenderer } = window.require('electron');
+
+
 
 let Webview;
 if (__DESKTOP__) {
@@ -287,6 +290,16 @@ class Replay extends Component {
 }
 
 const initialData = [
+  {
+    promise: () => {
+      ipcRenderer.send('toggle-proxy', true);
+
+      return new Promise(function(resolve, reject) {
+        ipcRenderer.on('toggle-proxy-done', () => { resolve(true); });
+      });
+
+    }
+  },
   {
     promise: ({ store: { dispatch, getState } }) => {
       const state = getState();

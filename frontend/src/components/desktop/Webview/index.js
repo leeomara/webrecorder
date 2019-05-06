@@ -43,11 +43,17 @@ class Webview extends Component {
     this.socket = null;
     this.webviewHandle = null;
     this.internalUpdate = false;
-    this.state = { loading: false };
+    this.state = { loading: false, waitForProxy: true };
+
+    const currMode = props.currMode;
+
+    //ipcRenderer.on('toggle-proxy-done', () => { this.setState({ loading: false, waitForProxy: false }) });
+
+    //ipcRenderer.send('toggle-proxy', currMode != 'live');
   }
 
   componentDidMount() {
-    const { currMode } = this.context;
+    const { currMode, user } = this.context;
     const { dispatch, host, params } = this.props;
 
     const realHost = host || appHost;
@@ -67,7 +73,7 @@ class Webview extends Component {
 
     if (nextProps.url !== url || nextProps.timestamp !== timestamp) {
       if (!this.internalUpdate) {
-        this.setState({ loading: true });
+        this.setState({ loading: true, waitForProxy: false });
         this.webviewHandle.loadURL(this.buildProxyUrl(nextProps.url, nextProps.timestamp));
       }
       this.internalUpdate = false;
@@ -94,6 +100,9 @@ class Webview extends Component {
 
   buildProxyUrl(url, timestamp) {
     const { user, coll, rec, currMode } = this.context;
+    if (currMode === "live") {
+      return url;
+    }
     let proxyUrl = `http://webrecorder.proxy/${user}/${coll}/`;
     if (rec) {
       proxyUrl += `${rec}/${currMode}/`;
@@ -139,7 +148,7 @@ class Webview extends Component {
         this.openDroppedFile(state.filename);
         break;
       case 'load':
-        this.setState({ loading: false });
+        this.setState({ loading: false, waitForProxy: false });
         this.addNewPage(state);
         break;
       case 'hashchange': {
@@ -192,20 +201,23 @@ class Webview extends Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, waitForProxy } = this.state;
     const { timestamp, url } = this.props;
+    const { user, currMode } = this.context;
+
+    console.log(waitForProxy);
 
     const classes = classNames('webview-wrapper', { loading });
 
     return (
       <div className={classes}>
-        <webview
-          id="replay"
-          ref={(obj) => { this.webviewHandle = obj; }}
-          src={this.buildProxyUrl(url, timestamp)}
-          autosize="on"
-          plugins="true"
-          partition="persist:wr" />
+      <webview
+        id="replay"
+        ref={(obj) => { this.webviewHandle = obj; }}
+        src={this.buildProxyUrl(url, timestamp)}
+        autosize="on"
+        plugins="true"
+        partition={`persist:${user}`} />
       </div>
     );
   }
