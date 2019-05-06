@@ -13,6 +13,7 @@ import {
   Extract,
   Home,
   ListDetail,
+  Live,
   Logout,
   NewPassword,
   NewRecording,
@@ -111,6 +112,16 @@ const controllerRoutes = [
     exact: true,
     footer: false,
     name: 'new recording'
+  },
+  {
+    // live browser pepare (for desktop)
+    path: `${userPath}/:coll/live/:splat(.*)`,
+    breadcrumb: 'Live',
+    classOverride: '',
+    component: Live,
+    exact: true,
+    footer: false,
+    name: 'live prepare'
   },
   {
     // record with remote browser id
