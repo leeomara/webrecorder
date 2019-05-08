@@ -21,9 +21,13 @@ import {
   Record,
   RegisterAccount,
   Replay,
-  UserSignup,
-  UserSettings
+  UserSignup
 } from './containers';
+
+
+const SettingsUI = __DESKTOP__ ?
+  require('containers/DesktopSettings/DesktopSettings') :
+  require('containers/UserSettings/UserSettings');
 
 
 const userPath = '/:user([^_][A-Za-z0-9-_]+)';
@@ -40,7 +44,7 @@ const userRoutes = [
   {
     path: `${userPath}/_settings`,
     breadcrumb: 'Settings',
-    component: UserSettings,
+    component: SettingsUI,
     exact: true,
     footer: true,
     name: 'settings'

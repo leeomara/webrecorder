@@ -120,10 +120,6 @@ class UserSettingsUI extends Component {
     return null;
   }
 
-  handleChange = (evt) => {
-    this.setState({ [evt.target.name]: evt.target.value });
-  }
-
   toggleDelete = evt => this.setState({ showModal: !this.state.showModal })
 
   closeDeleteModal = evt => this.setState({ showModal: false })
